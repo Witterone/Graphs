@@ -165,16 +165,16 @@ class Graph:
 
         if v not in visited:
 
-            new_path = list(path)+ [v]
+            new_path = list(path) + [v]
             visited.add(v)
             
             for  bro in self.get_neighbors(v):
                 
                 if bro == destination_vertex:
                     
-                    return (new_path+[bro])
-                self.dfs_recursive(bro,destination_vertex, visited, new_path)
-        
+                    return new_path+[bro]
+                result =self.dfs_recursive(bro,destination_vertex, visited, new_path)
+            return  result
 if __name__ == '__main__':
     graph = Graph()  # Instantiate your graph
     # https://github.com/LambdaSchool/Graphs/blob/master/objectives/breadth-first-search/img/bfs-visit-order.png
