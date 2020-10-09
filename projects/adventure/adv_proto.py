@@ -13,8 +13,8 @@ world = World()
 # map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
-map_file = "maps/test_loop_fork.txt"
-# map_file = "maps/main_maze.txt"
+# map_file = "maps/test_loop_fork.txt"
+map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -96,28 +96,28 @@ def walk_back(cur_room):
         cors = q.dequeue()
         v = cors[-1]
         
-       
+        if v not in visited:
+            room = world.rooms[cors[-2]]
+            new_room = world.rooms[v]
         if v not in searched:
             searched.add(v)
-            if len(get_adj(v))<2:
-                back = get_adj(v)[0]
-                new_cors = cors + [back[0]]
-                q.enqueue(new_cors)
-                
-            else:
-                for rms in get_adj(v):
+            
+            for rms in get_adj(v):
                     
                     if rms[0] not in visited :
                         
                         if mapper[v][rms[1]]=="?":
                             room = world.rooms[v]
                             new_room = room.get_room_in_direction(rms[1])
-                            if new_room is not None and new_room.id not in mapper:
+                            
+                            if new_room is not None:
                                 if mapper[v][rms[1]] != new_room.id:
                                     mapper[v][rms[1]]=new_room.id
-                                mapper[new_room.id] = dict()
-                                mapper[new_room.id][look_back(rms[1])]=v
+                                if new_room.id not in mapper:
+                                    mapper[new_room.id] = dict()
+                                    mapper[new_room.id][look_back(rms[1])]=v
                                 # print("back",mapper[v][rms[1]],mapper[new_room.id][look_back(rms[1])])                              
+                                new_cors = cors + [rms[0]]
                                 break
                                 
                             else:
@@ -125,19 +125,23 @@ def walk_back(cur_room):
                                 mapper[v].pop(rms[1])
                                 q.enqueue(cors)
                         else:
-                            
+                            print("course",cors)
                             room = world.rooms[v]
                             new_room = room.get_room_in_direction(rms[1])
-                            print("unvisited",room.id,new_room.id)
+                            print("unvisited",cors,room.id,new_room.id)
+                            path = cors + [new_room.id]
                             break
-                        
+                            
                     elif rms[0] not in searched:
                         new_cors = cors + [rms[0]]
+                        
                         q.enqueue(new_cors)
                     
                         
     if new_room is not None:
-        path = cors+[room.id,new_room.id]
+        if len(path)<1:
+            path = cors+[room.id,new_room.id]
+        # path = cors + [new_room.id]
     if new_room is None:
         new_room = -1
     
@@ -186,7 +190,7 @@ def pathfinder(map_set,room = None,travel = None):
                 
             
                     if rm is not None and rm.id not in visited:
-                        travel.append(dr)
+                        travel= list(travel) + [dr]
                         mapper[r.id][dr]=rm.id
                         mapper[rm.id] = dict()
                         mapper[rm.id][look_back(dr)] = r.id
@@ -218,19 +222,19 @@ print(traversal_path, visited, mapper)
 
 
 # TRAVERSAL TEST
-# visited_rooms = set()
-# player.current_room = world.starting_room
-# visited_rooms.add(player.current_room)
+visited_rooms = set()
+player.current_room = world.starting_room
+visited_rooms.add(player.current_room)
 
-# for move in traversal_path:
-#     player.travel(move)
-#     visited_rooms.add(player.current_room)
+for move in traversal_path:
+    player.travel(move)
+    visited_rooms.add(player.current_room)
 
-# if len(visited_rooms) == len(room_graph):
-#     print(f"TESTS PASSED: {len(traversal_path)} moves, {len(visited_rooms)} rooms visited")
-# else:
-#     print("TESTS FAILED: INCOMPLETE TRAVERSAL")
-#     print(f"{len(room_graph) - len(visited_rooms)} unvisited rooms")
+if len(visited_rooms) == len(room_graph):
+    print(f"TESTS PASSED: {len(traversal_path)} moves, {len(visited_rooms)} rooms visited")
+else:
+    print("TESTS FAILED: INCOMPLETE TRAVERSAL")
+    print(f"{len(room_graph) - len(visited_rooms)} unvisited rooms")
 
 
 
