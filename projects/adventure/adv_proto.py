@@ -118,6 +118,7 @@ def walk_back(cur_room):
                                     mapper[new_room.id][look_back(rms[1])]=v
                                 # print("back",mapper[v][rms[1]],mapper[new_room.id][look_back(rms[1])])                              
                                 new_cors = cors + [rms[0]]
+                                path = cors + [new_room.id]
                                 break
                                 
                             else:
@@ -125,10 +126,10 @@ def walk_back(cur_room):
                                 mapper[v].pop(rms[1])
                                 q.enqueue(cors)
                         else:
-                            print("course",cors)
+                            # print("course",cors)
                             room = world.rooms[v]
                             new_room = room.get_room_in_direction(rms[1])
-                            print("unvisited",cors,room.id,new_room.id)
+                            # print("unvisited",cors,room.id,new_room.id)
                             path = cors + [new_room.id]
                             break
                             
@@ -146,7 +147,7 @@ def walk_back(cur_room):
         new_room = -1
     
     way = [] 
-    print(path)           
+    # print(path)           
     for indx in range(len(path)-1):
         for dr in mapper[path[indx]]:            
             if mapper[path[indx]][dr] == path[indx+1]:
@@ -216,8 +217,12 @@ def pathfinder(map_set,room = None,travel = None):
     
      
 traversal_path = pathfinder(world)         
-    
-print(traversal_path, visited, mapper)
+
+
+for i in range(500):
+    if i not in visited:
+        print(i)
+print(visited)
 
 
 
